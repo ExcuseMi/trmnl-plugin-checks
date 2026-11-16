@@ -1,10 +1,11 @@
-# Copy to .github/workflows/ of a plugin repo.
+# Copy to .github/workflows/plugin-check.yml of a plugin repo. The plugin repo runs the checks; results stay in its runs.
 name: plugin-check
 on:
   push:
   pull_request:
+  workflow_dispatch:
   schedule:
-    - cron: '41 5 * * 1'
+    - cron: '17 4 * * *'   # daily: a device TRMNL adds to its list is checked the next morning
 jobs:
   check:
     uses: ExcuseMi/trmnl-plugin-checks/.github/workflows/plugin-check.yml@main

@@ -25,5 +25,6 @@ jobs:
           ref: ${{ inputs.checks-ref }}
           path: checks
           token: ${{ secrets.CHECKS_TOKEN || github.token }}
+      - run: ruby checks/test/retry_test.rb
       - run: docker pull trmnl/trmnlp:latest
       - run: TPC_NAME="${{ github.event.repository.name }}" checks/bin/check "plugin-repo/${{ inputs.plugin-dir }}"

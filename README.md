@@ -34,10 +34,10 @@ Nothing to do: `TRMNLP::Testing::DeviceModels` reads trmnl.com/api/models on eve
 
 | File | Use |
 |---|---|
-| `.github/workflows/plugin-check.yml` | reusable (`workflow_call`); a plugin repo calls it, see `examples/call-plugin-check.yml` |
-| `.github/workflows/daily.yml` | 04:17 UTC matrix over the public repos in `plugins.txt`; outcome only in the run and job summaries |
+| `.github/workflows/plugin-check.yml` | reusable (`workflow_call`); each plugin repo calls it from its own workflow (`examples/call-plugin-check.yml`: on push, daily, by hand). Results stay in that repo's runs |
+| `.github/workflows/self-test.yml` | this repo's own tests (`test/retry_test.rb`) |
 
-GitHub-hosted runners only. The reusable workflow needs this repo readable by the caller (same org, or public).
+GitHub-hosted runners only. A font timeout (slow runner) is retried once; any other failure counts on the first try.
 
 ## Pilot (2026-11-16, trmnlp image 5558373f96d8)
 

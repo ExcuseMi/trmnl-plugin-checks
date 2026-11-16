@@ -41,6 +41,19 @@ module TPC
     out
   end
 
+  # Owner 2026-11-16: a font timeout (slow CI machine) is retried once; every other failure counts on the first try.
+  FONT_TIMEOUT = /fonts did not load/
+
+  def with_font_retry(tries: 2)
+    yield
+  rescue StandardError => e
+    tries -= 1
+    raise unless tries.positive? && e.message.match?(FONT_TIMEOUT)
+
+    warn "retry after font timeout: #{e.message[0, 120]}"
+    retry
+  end
+
   # One entry per distinct screen of TRMNL's live model list (a new device appears by itself). Models of the same
   # size and screen classes draw the same page, so they are checked once and named together. Models without CSS
   # classes (tidbyt, vestaboard) have no HTML screen and are left out.

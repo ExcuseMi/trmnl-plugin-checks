@@ -18,8 +18,9 @@ RSpec.describe 'Base checks' do
       names = screen[:same_as]
       label = "#{names.first}#{" (+#{names.size - 1} same size)" if names.size > 1} #{screen[:orientation]}"
       it "draws the #{view} view on #{label} without overflow or page errors [#{names.join(',')}]" do
-        page = trmnl.render(view:, device: screen[:device], orientation: screen[:orientation],
-                            mocks:, custom_fields:, variables:)
+        page = TPC.with_font_retry do
+          trmnl.render(view:, device: screen[:device], orientation: screen[:orientation], mocks:, custom_fields:, variables:)
+        end
         expect(page).to have_no_overflow.and(have_no_problems).and(have_no_leaked_text)
       end
     end

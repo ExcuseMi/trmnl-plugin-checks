@@ -1,8 +1,8 @@
 # To do: every public recipe on the base checks
 
-Status per plugin. A plugin joins `plugins.txt` (the daily run) once it has a data set: without one it only draws error screens.
+Status per plugin. Each plugin repo runs the checks itself (examples/call-plugin-check.yml: on push and daily). It gets the workflow once it has a data set (its tests/mocks.json): without one it only draws error screens.
 
-| Recipe | Repo | Installs | Data set | Daily | Findings |
+| Recipe | Repo | Installs | Data set | Workflow | Findings |
 |---|---|---|---|---|---|
 | SkyWatch | trmnl-skywatch-plugin | 353 | to do | off |  |
 | Air Quality | trmnl-air-quality-plugin | 210 | to do | off |  |
@@ -41,6 +41,6 @@ Status per plugin. A plugin joins `plugins.txt` (the daily run) once it has a da
 | Payment QR Code | trmnl-payment-qr-code-plugin | 1 | to do | off |  |
 | Esthio Schoolmenu | trmnl-esthio-schoolmenu-plugin | 0 | to do | off |  |
 
-Private repos: 9, not in the daily run (they need a token or another runner; later).
+Private repos: 9, no workflow yet (they need a token or another runner; later).
 
 No repo found: Paprika Meal Plan, Paprika Groceries & Pantry, Paprika Recipe, Paprika Menus
