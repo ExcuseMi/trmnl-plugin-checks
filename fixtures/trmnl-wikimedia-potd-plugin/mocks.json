@@ -1,0 +1,4 @@
+{
+  "re:featuredfeed": { "body_file": "tests/fixtures/potd.atom" },
+  "re:action=query": { "json_file": "tests/fixtures/extmetadata.json" }
+}

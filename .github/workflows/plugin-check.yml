@@ -1,0 +1,29 @@
+# Reusable: a plugin repo calls this to run the base checks on itself (see examples/call-plugin-check.yml).
+name: plugin-check
+on:
+  workflow_call:
+    inputs:
+      plugin-dir:
+        description: Plugin repo folder to check, relative to the repo root
+        type: string
+        default: .
+      checks-ref:
+        description: Ref of trmnl-plugin-checks to use
+        type: string
+        default: main
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: plugin-repo
+      - uses: actions/checkout@v4
+        with:
+          repository: tiny-paper/trmnl-plugin-checks
+          ref: ${{ inputs.checks-ref }}
+          path: checks
+          token: ${{ secrets.CHECKS_TOKEN || github.token }}
+      - run: docker pull trmnl/trmnlp:latest
+      - run: checks/bin/check "plugin-repo/${{ inputs.plugin-dir }}"

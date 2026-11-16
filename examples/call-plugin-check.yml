@@ -1,0 +1,12 @@
+# Copy to .github/workflows/ of a plugin repo.
+name: plugin-check
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '41 5 * * 1'
+jobs:
+  check:
+    uses: tiny-paper/trmnl-plugin-checks/.github/workflows/plugin-check.yml@main
+    with:
+      plugin-dir: .

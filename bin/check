@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Run the base checks against one plugin repo (or its plugin/ folder), in the trmnl/trmnlp Docker image.
+# Usage: bin/check <plugin-dir>      Env: TPC_KEEP=1 keeps the temp dir, TPC_IMAGE overrides the image.
+# The plugin folder is only read: a copy is made in a temp dir and the checks run on the copy.
+set -euo pipefail
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+src="$(cd "${1:?usage: bin/check <plugin-dir>}" && pwd)"
+image="${TPC_IMAGE:-trmnl/trmnlp:latest}"
+name="$(basename "$src")"
+
+# Find the plugin folder: <repo>/plugin/src, <dir>/src, or the flat layout (<repo>/plugin/settings.yml).
+if   [ -f "$src/plugin/src/settings.yml" ]; then plug="$src/plugin"; layout=src
+elif [ -f "$src/src/settings.yml" ];        then plug="$src";        layout=src
+elif [ -f "$src/plugin/settings.yml" ];     then plug="$src/plugin"; layout=flat
+elif [ -f "$src/settings.yml" ];            then plug="$src";        layout=flat
+else echo "no plugin found in $src (looked for plugin/src/settings.yml, src/settings.yml, plugin/settings.yml)" >&2; exit 2
+fi
+
+tmp="$(mktemp -d "${TMPDIR:-/tmp}/tpc.XXXXXX")"
+res="$tmp/results"; work="$tmp/plugin"
+mkdir -p "$res" "$work"
+cleanup() {
+  [ -n "${TPC_KEEP:-}" ] && { echo "kept: $tmp"; return; }
+  # the container wrote as its own user; remove through it, then the rest
+  docker run --rm -v "$tmp:/t" --entrypoint sh "$image" -c 'rm -rf /t/plugin /t/results' >/dev/null 2>&1 || true
+  rm -rf "$tmp" 2>/dev/null || true
+}
+trap cleanup EXIT
+
+if [ "$layout" = src ]; then
+  tar -C "$plug" --exclude=_build --exclude=node_modules --exclude=.git --exclude=snapshots -cf - . | tar -C "$work" -xf -
+else
+  mkdir -p "$work/src"
+  tar -C "$plug" --exclude=_build --exclude=node_modules --exclude=.git -cf - . | tar -C "$work/src" -xf -
+fi
+[ -f "$work/.trmnlp.yml" ] || printf -- '---\ncustom_fields: {}\n' > "$work/.trmnlp.yml"
+mkdir -p "$work/tests/tpc"
+cp "$root"/spec/*.rb "$work/tests/tpc/"
+fx="$root/fixtures/$name/mocks.json"
+[ -f "$fx" ] && cp "$fx" "$work/tests/tpc_mocks.json"
+[ -f "$work/tests/tpc_mocks.json" ] || [ -f "$work/tests/mocks.json" ] || echo "note: no mocks for $name (requests answer 599, so the error screens are what is drawn)"
+
+echo "== $name ($layout layout), image $(docker image inspect "$image" --format '{{.Id}}' | cut -c8-19)"
+set +e
+docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e TPC_RESULTS=/results \
+  -v "$work:/plugin" -v "$res:/results" "$image" test tests/tpc 2>&1 | tail -n 60 | tee "$res/console.txt"
+code=${PIPESTATUS[0]}
+set -e
+
+python3 "$root/bin/summarize.py" "$res/results.json" "$name" > "$res/summary.md" || echo "no results.json: the run did not finish" > "$res/summary.md"
+cat "$res/summary.md"
+[ -n "${GITHUB_STEP_SUMMARY:-}" ] && cat "$res/summary.md" >> "$GITHUB_STEP_SUMMARY"
+[ -n "${TPC_SUMMARY_COPY:-}" ] && cp "$res/summary.md" "$TPC_SUMMARY_COPY"
+exit "$code"

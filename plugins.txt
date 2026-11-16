@@ -1,0 +1,16 @@
+# Public plugin repos checked by the daily run, one owner/repo per line.
+ExcuseMi/trmnl-wikimedia-potd-plugin
+ExcuseMi/trmnl-comic-library-plugin
+ExcuseMi/trmnl-tech-emails-plugin
+ExcuseMi/trmnl-payment-qr-code-plugin
+ExcuseMi/trmnl-pokemon-cards-plugin
+ExcuseMi/trmnl-inaturalist-plugin
+ExcuseMi/trmnl-neocities-plugin
+ExcuseMi/trmnl-skywatch-plugin
+ExcuseMi/trmnl-nextcloud-photos-plugin
+ExcuseMi/trmnl-earth-observatory-plugin
+ExcuseMi/trmnl-artificial-intelligence-plugin
+ExcuseMi/trmnl-trakt-tv-plugin
+ExcuseMi/trmnl-trending-recipes-plugin
+ExcuseMi/trmnl-email-messages-plugin
+ExcuseMi/trmnl-github-releases-plugin

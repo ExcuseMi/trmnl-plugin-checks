@@ -1,0 +1,34 @@
+# Daily run over the public plugin repos in plugins.txt. The outcome is only in the run and its job summaries.
+name: daily
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    outputs:
+      plugins: ${{ steps.list.outputs.plugins }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          json=$(grep -v '^\s*#' plugins.txt | grep -v '^\s*$' | jq -R . | jq -sc .)
+          echo "plugins=$json" >> "$GITHUB_OUTPUT"
+  check:
+    needs: list
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        plugin: ${{ fromJson(needs.list.outputs.plugins) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.plugin }}
+          path: plugin-repo
+      - run: docker pull trmnl/trmnlp:latest
+      - run: bin/check plugin-repo
