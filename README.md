@@ -38,3 +38,14 @@ Nothing to do: `TRMNLP::Testing::DeviceModels` reads trmnl.com/api/models on eve
 | `.github/workflows/daily.yml` | 04:17 UTC matrix over the public repos in `plugins.txt`; outcome only in the run and job summaries |
 
 GitHub-hosted runners only. The reusable workflow needs this repo readable by the caller (same org, or public).
+
+## Pilot (2026-11-16, trmnlp image 5558373f96d8)
+
+| Plugin | Result | Top reasons |
+|---|---|---|
+| lichess-puzzle | 7 of 474 fail, 7 min | overflow on playdate (400x240) only |
+| wikimedia-potd (fixture mocks) | 31 of 486 fail, 12 min | playdate overflow; 8 "fonts did not load within 10s" (looks like a flake) |
+| comic-library (flat layout, no mocks) | 9 of 480 fail, 6 min | onyx_boox_go_7 overflow; no mock for its feed URLs |
+| comic-library copy with a broken view | 139 of 480 fail | leaked `undefined NaN` and a 5000px bar are caught |
+
+Comic Library deploys with `scripts/upload_plugin.py` from a flat `plugin/` folder (no `src/`); bin/check wraps it into `src/` in the copy and never touches the repo.
