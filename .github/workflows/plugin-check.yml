@@ -21,7 +21,7 @@ jobs:
           path: plugin-repo
       - uses: actions/checkout@v4
         with:
-          repository: tiny-paper/trmnl-plugin-checks
+          repository: ExcuseMi/trmnl-plugin-checks
           ref: ${{ inputs.checks-ref }}
           path: checks
           token: ${{ secrets.CHECKS_TOKEN || github.token }}
