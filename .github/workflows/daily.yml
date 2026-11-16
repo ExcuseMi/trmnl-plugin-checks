@@ -31,4 +31,6 @@ jobs:
           repository: ${{ matrix.plugin }}
           path: plugin-repo
       - run: docker pull trmnl/trmnlp:latest
-      - run: bin/check plugin-repo
+      - run: TPC_NAME="${PLUGIN#*/}" bin/check plugin-repo
+        env:
+          PLUGIN: ${{ matrix.plugin }}

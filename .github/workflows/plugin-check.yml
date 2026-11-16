@@ -26,4 +26,4 @@ jobs:
           path: checks
           token: ${{ secrets.CHECKS_TOKEN || github.token }}
       - run: docker pull trmnl/trmnlp:latest
-      - run: checks/bin/check "plugin-repo/${{ inputs.plugin-dir }}"
+      - run: TPC_NAME="${{ github.event.repository.name }}" checks/bin/check "plugin-repo/${{ inputs.plugin-dir }}"

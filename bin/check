@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Run the base checks against one plugin repo (or its plugin/ folder), in the trmnl/trmnlp Docker image.
-# Usage: bin/check <plugin-dir>      Env: TPC_KEEP=1 keeps the temp dir, TPC_IMAGE overrides the image.
+# Usage: bin/check <plugin-dir>      Env: TPC_KEEP=1 keeps the temp dir, TPC_IMAGE overrides the image, TPC_NAME names the repo.
 # The plugin folder is only read: a copy is made in a temp dir and the checks run on the copy.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 src="$(cd "${1:?usage: bin/check <plugin-dir>}" && pwd)"
 image="${TPC_IMAGE:-trmnl/trmnlp:latest}"
-name="$(basename "$src")"
+name="${TPC_NAME:-$(basename "$src")}"   # TPC_NAME: the repo name when the checkout folder is named otherwise (CI)
 
 # Find the plugin folder: <repo>/plugin/src, <dir>/src, or the flat layout (<repo>/plugin/settings.yml).
 if   [ -f "$src/plugin/src/settings.yml" ]; then plug="$src/plugin"; layout=src
