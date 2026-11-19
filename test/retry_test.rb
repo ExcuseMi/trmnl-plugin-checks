@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 # Plain-Ruby check of TPC.with_font_retry: `ruby test/retry_test.rb`. Runs in CI before the plugin checks.
+# It runs on the runner's own Ruby (3.3 on ubuntu-latest), older than the trmnlp image's: no `it` block parameter in what it calls
+# (2026-11-19: TPC.skipped used `it`, passed on Ruby 4 here and stopped every plugin's check on the runner). Try it with /usr/bin/ruby3.3.
 module TRMNLP; module Testing; def self.plugin_dir = '.'; end; end
 require_relative '../spec/support'
 def check(name, ok) = (puts "#{ok ? 'ok' : 'FAIL'} #{name}"; exit 1 unless ok)
@@ -14,5 +16,5 @@ check('any other failure is not retried', n == 1)
 # TPC.skipped: the devices a plugin leaves out of its checks (TPC_SKIP_DEVICES)
 ms = [{ 'name' => 'og_png' }, { 'name' => 'xteink_x3' }, { 'name' => 'v2' }]
 check('no skip list keeps every device', TPC.skipped(ms, '').length == 3 && TPC.skipped(ms, nil).length == 3)
-check('a named device is left out, the others stay', TPC.skipped(ms, 'xteink_x3').map { it['name'] } == %w[og_png v2])
-check('several names, commas or spaces; an unknown name changes nothing', TPC.skipped(ms, 'xteink_x3, v2 nope').map { it['name'] } == %w[og_png])
+check('a named device is left out, the others stay', TPC.skipped(ms, 'xteink_x3').map { |m| m['name'] } == %w[og_png v2])
+check('several names, commas or spaces; an unknown name changes nothing', TPC.skipped(ms, 'xteink_x3, v2 nope').map { |m| m['name'] } == %w[og_png])

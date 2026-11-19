@@ -62,7 +62,7 @@ module TPC
   # every model that shares it is named.
   def skipped(models, env = ENV.fetch('TPC_SKIP_DEVICES', ''))
     names = env.to_s.split(/[\s,]+/).reject(&:empty?)
-    models.reject { names.include?(it['name']) }
+    models.reject { |m| names.include?(m['name']) } # no `it` here: test/retry_test.rb runs this on the runner's own Ruby (3.3), not in the trmnlp image
   end
 
   def screens
