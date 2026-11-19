@@ -1,4 +1,5 @@
-# The checks repo's own tests (not plugin results).
+# The checks repo's own tests (not plugin results). Runs on every pushed branch: push a branch and see this green before main
+# (2026-11-19: a change went straight to main and stopped every plugin's check until the next commit).
 name: self-test
 on: [push, pull_request]
 jobs:
@@ -6,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
+      # no Ruby is set up, on purpose: the runner's own Ruby is what plugin-check.yml runs test/retry_test.rb on in every plugin repo
+      - run: ruby -v
       - run: ruby test/retry_test.rb
+      - run: for f in spec/*.rb test/*.rb; do ruby -c "$f" > /dev/null || exit 1; done
