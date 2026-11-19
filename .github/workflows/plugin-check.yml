@@ -11,6 +11,10 @@ on:
         description: Ref of trmnl-plugin-checks to use
         type: string
         default: main
+      skip-devices:
+        description: Device names to leave out of the checks (commas or spaces); say why beside it in the calling workflow
+        type: string
+        default: ''
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -27,4 +31,4 @@ jobs:
           token: ${{ secrets.CHECKS_TOKEN || github.token }}
       - run: ruby checks/test/retry_test.rb
       - run: docker pull trmnl/trmnlp:latest
-      - run: TPC_NAME="${{ github.event.repository.name }}" checks/bin/check "plugin-repo/${{ inputs.plugin-dir }}"
+      - run: TPC_NAME="${{ github.event.repository.name }}" TPC_SKIP_DEVICES="${{ inputs.skip-devices }}" checks/bin/check "plugin-repo/${{ inputs.plugin-dir }}"

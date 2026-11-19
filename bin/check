@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run the base checks against one plugin repo (or its plugin/ folder), in the trmnl/trmnlp Docker image.
 # Usage: bin/check <plugin-dir>      Env: TPC_KEEP=1 keeps the temp dir, TPC_IMAGE overrides the image, TPC_NAME names the repo.
+# TPC_SKIP_DEVICES: device names the plugin leaves out (commas or spaces); the plugin's workflow says why.
 # The plugin folder is only read: a copy is made in a temp dir and the checks run on the copy.
 set -euo pipefail
 
@@ -43,7 +44,7 @@ fx="$root/fixtures/$name/mocks.json"
 
 echo "== $name ($layout layout), image $(docker image inspect "$image" --format '{{.Id}}' | cut -c8-19)"
 set +e
-docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e TPC_RESULTS=/results \
+docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e TPC_RESULTS=/results -e TPC_SKIP_DEVICES="${TPC_SKIP_DEVICES:-}" \
   -v "$work:/plugin" -v "$res:/results" "$image" test tests/tpc 2>&1 | tail -n 60 | tee "$res/console.txt"
 code=${PIPESTATUS[0]}
 set -e

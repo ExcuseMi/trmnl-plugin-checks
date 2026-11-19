@@ -57,8 +57,16 @@ module TPC
   # One entry per distinct screen of TRMNL's live model list (a new device appears by itself). Models of the same
   # size and screen classes draw the same page, so they are checked once and named together. Models without CSS
   # classes (tidbyt, vestaboard) have no HTML screen and are left out.
+  # A plugin may leave named devices out (workflow input skip-devices, env TPC_SKIP_DEVICES: names separated by commas or
+  # spaces), each with its reason written beside the input in the plugin's own workflow. A screen is left out only when
+  # every model that shares it is named.
+  def skipped(models, env = ENV.fetch('TPC_SKIP_DEVICES', ''))
+    names = env.to_s.split(/[\s,]+/).reject(&:empty?)
+    models.reject { names.include?(it['name']) }
+  end
+
   def screens
-    models = TRMNLP::Testing::DeviceModels.send(:models).select { it.dig('css', 'classes') }
+    models = skipped(TRMNLP::Testing::DeviceModels.send(:models).select { it.dig('css', 'classes') })
     groups = models.group_by { [it['width'], it['height'], it.dig('css', 'classes')] }
     groups.values.flat_map do |group|
       %i[landscape portrait].map { |orientation| { device: group.first['name'], orientation:, same_as: group.map { it['name'] } } }

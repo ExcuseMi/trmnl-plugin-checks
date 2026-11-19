@@ -10,3 +10,9 @@ n = 0; begin TPC.with_font_retry { n += 1; raise "The page's fonts did not load 
 check('font timeout twice still fails', n == 2)
 n = 0; begin TPC.with_font_retry { n += 1; raise 'expected nothing to overflow' }; rescue StandardError; end
 check('any other failure is not retried', n == 1)
+
+# TPC.skipped: the devices a plugin leaves out of its checks (TPC_SKIP_DEVICES)
+ms = [{ 'name' => 'og_png' }, { 'name' => 'xteink_x3' }, { 'name' => 'v2' }]
+check('no skip list keeps every device', TPC.skipped(ms, '').length == 3 && TPC.skipped(ms, nil).length == 3)
+check('a named device is left out, the others stay', TPC.skipped(ms, 'xteink_x3').map { it['name'] } == %w[og_png v2])
+check('several names, commas or spaces; an unknown name changes nothing', TPC.skipped(ms, 'xteink_x3, v2 nope').map { it['name'] } == %w[og_png])
